@@ -2,13 +2,14 @@ import mysql from 'mysql2/promise';
 import * as crypto from 'node:crypto';
 import {Security} from "../security/security.js";
 import {validateUsername, validateEmail, validatePassword} from "../security/validator.js";
+import {DB_HOSTNAME, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER} from "../config.js";
 // Connection configuration
 const config = {
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: 'root',
-    database: 'authdb',
+    host: DB_HOSTNAME,
+    port: DB_PORT,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME,
 };
 
 const connection = await mysql.createConnection(config);

@@ -2,14 +2,14 @@ import { UserController } from "./controllers/user-controller.js";
 import express from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
-import {SECRET_JWT_KEY} from "./config.js";
+import {SECRET_JWT_KEY, APPLICATION_PORT} from "./config.js";
 import cookieParser from 'cookie-parser'
-
+import getToken from './security/auth.js'
 
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: `http://localhost:3000`,
     credentials: true
 }));
 app.use(cookieParser());
@@ -28,20 +28,13 @@ app.get('/', (req, res) => {
     }
 });
 
+
+
 app.post('/login', async (req, res) => {
     try {
         const user = await UserController.login(req, res);
 
-        const token = jwt.sign(
-            {
-                email: user.email,
-                username: user.username,
-                id: user.id,
-                role: user.role
-            },
-            SECRET_JWT_KEY,
-            { expiresIn: "1h" }
-        );
+        const token = getToken(user)
         res.cookie('access_token', token, {
             httpOnly: true,
             secure: false,
@@ -105,6 +98,6 @@ app.get('/users', async (req, res) => {
 
 
 // Start server
-app.listen(5000, () => {
+app.listen(APPLICATION_PORT, () => {
     console.log(`Server started on port 5000`);
 });

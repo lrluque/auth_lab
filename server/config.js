@@ -1,4 +1,9 @@
 export const {
-    SERVER_PORT = 3000,
+    DB_USER = 'root',
+    DB_PASSWORD = 'root',
+    DB_HOSTNAME = 'localhost',
+    DB_PORT = '3306',
+    DB_NAME = 'authdb',
+    APPLICATION_PORT = 5000,
     SECRET_JWT_KEY = 'ALKSFJHLkajhsLF38HROWEFUP093ruFOIHDhdkfjhslfhaf8HOWIFdjDJFHSL'
 } = process.env
