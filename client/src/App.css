@@ -1,0 +1,110 @@
+/* Global reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f4f6f8;
+    color: #333;
+}
+
+/* Main container styling */
+.mainContainer {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Title styling */
+.titleContainer {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #4a90e2;
+    margin-bottom: 1.5rem;
+}
+
+/* Input container for each label and input */
+.inputContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.2rem;
+    text-align: left;
+}
+
+/* Styling for input fields */
+.inputBox {
+    padding: 0.8rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    margin-top: 0.5rem;
+    transition: border-color 0.3s;
+}
+
+.inputBox:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.2);
+}
+
+/* Error message styling */
+.errorLabel {
+    color: #d9534f;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    text-align: left;
+}
+
+/* Button styling */
+.button {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.inputButton {
+    background-color: #4a90e2;
+}
+
+.inputButton:hover {
+    background-color: #357abd;
+}
+
+.returnButton {
+    background-color: #6c757d;
+}
+
+.returnButton:hover {
+    background-color: #5a6268;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 420px) {
+    .mainContainer {
+        padding: 1.5rem;
+        width: 90%;
+    }
+}
