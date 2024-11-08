@@ -39,10 +39,9 @@ const Signup = () => {
                 const loginData = await loginResponse.json();
 
                 if (loginResponse.ok && loginData.status === 'success') {
-                    // Step 3: Navigate to the protected route on successful login
                     navigate('/protected');
                 } else {
-                    setErrorMessage(loginData.message || 'Login failed. Please try again.');
+                    setErrorMessage(loginData.message || 'Email or password invalid.');
                 }
             } else {
                 // Handle signup error

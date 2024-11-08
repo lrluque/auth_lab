@@ -1,10 +1,11 @@
-import { UserController } from "./controllers/user-controller.js";
+import { UserController } from "./controllers/UserController.js";
 import express from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import {SECRET_JWT_KEY, APPLICATION_PORT} from "./config.js";
 import cookieParser from 'cookie-parser'
-import getToken from './security/auth.js'
+import getToken from './security/Auth.js'
+import {Logger} from "./security/Logger.js";
 
 const app = express();
 app.use(express.json());
@@ -14,17 +15,17 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
-// Route definitions
+
 app.get('/', (req, res) => {
     const token = req.cookies.access_token;
     if (!token) {
-        res.json({status : 'not_logged'});
+        return res.json({status : 'not_logged'});
     }
     try {
-        const data = jwt.verify(token, SECRET_JWT_KEY);
-        res.json({status: 'logged'});
+        jwt.verify(token, SECRET_JWT_KEY);
+        return res.json({status: 'logged'});
     } catch (error) {
-        res.json({status: 'not_logged'});
+        return res.json({status: 'not_logged'});
     }
 });
 
@@ -32,9 +33,9 @@ app.get('/', (req, res) => {
 
 app.post('/login', async (req, res) => {
     try {
-        const user = await UserController.login(req, res);
+        const user = await UserController.login(req);
+        const token = getToken(user);
 
-        const token = getToken(user)
         res.cookie('access_token', token, {
             httpOnly: true,
             secure: false,
@@ -43,12 +44,25 @@ app.post('/login', async (req, res) => {
             .status(201)
             .json({ status: 'success' });
 
+        Logger.logSuccessfulLogin(user.id, req.ip.toString())
+
     } catch (error) {
-        if (!res.headersSent) {
-            res.status(500).json({ message: 'Error login', error: error.message });
-        }
+            try {
+                const user = await UserController.getUser(req, res);
+                let id = null;
+                if (user !== null) {
+                    id = user.id
+                }
+                Logger.logFailureLogin(id, req.ip.toString());
+                res.status(500).json({ message: 'Invalid email or password' });
+            } catch (innerError) {
+                console.error('Error during login attempt:', innerError);
+                res.status(500).json({ message: 'Internal server error' });
+            }
     }
 });
+
+
 
 app.post('/register', async (req, res) => {
     try {
@@ -59,6 +73,9 @@ app.post('/register', async (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
+    const token = req.cookies.access_token;
+    const decoded = jwt.verify(token, SECRET_JWT_KEY);
+    Logger.logLogout(decoded.id, req.ip)
     res.clearCookie('access_token');
     res.json({ status: 'success', message: 'Logged out successfully' });
 });

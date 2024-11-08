@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 import * as crypto from 'node:crypto';
-import {Security} from "../security/security.js";
-import {validateUsername, validateEmail, validatePassword} from "../security/validator.js";
+import {Security} from "../security/Security.js";
+import {validateUsername, validateEmail, validatePassword} from "../security/Validator.js";
 import {DB_HOSTNAME, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER} from "../config.js";
 // Connection configuration
 const config = {
@@ -65,7 +65,7 @@ export class UserModel {
 
     static async getUserByEmail(email) {
         const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
-        return rows;
+        return rows[0];
     }
 
     static async checkUsernameExists(username) {
@@ -85,7 +85,7 @@ export class UserModel {
         if (rows.length === 0 || !rows) {
             throw new Error('Email or password is not valid');
         }
-        const user = rows[0];
+        const user = rows;
         // 2. Check if password is correct
         const isPasswordValid = await Security.comparePassword(password, user.password_hash)
         if (!isPasswordValid) {

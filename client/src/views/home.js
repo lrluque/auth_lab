@@ -49,7 +49,7 @@ const Home = () => {
             if (data.status === 'success') {
                 navigate('/protected');
             } else {
-                setErrorMessage(data.message || 'Login failed. Please try again.');
+                setErrorMessage(data.message || 'Email or password invalid.');
             }
         } catch (error) {
             console.error('Login error:', error);

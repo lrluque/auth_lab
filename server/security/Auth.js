@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import {SECRET_JWT_KEY} from "../config.js";
 
 function getToken(user) {
-    const token = jwt.sign(
+    return jwt.sign(
         {
             email: user.email,
             username: user.username,
@@ -12,7 +12,6 @@ function getToken(user) {
         SECRET_JWT_KEY,
         {expiresIn: "1h"}
     );
-    return token;
 }
 
 export default getToken
