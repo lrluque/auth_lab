@@ -1,4 +1,5 @@
 import {UserModel} from "../models/UserModel.js";
+import {verifyToken} from "../security/Verification.js";
 
 
 export class UserController {
@@ -34,10 +35,24 @@ export class UserController {
     static async createUser(req, res) {
         try {
             const { username, password, email } = req.body;
-            const user = await UserController.createUser(username, email, password);
+            const user = await UserModel.createUser(username, email, password);
             res.status(201).json({ message: 'UserModel created successfully' });
         } catch (error) {
             res.status(500).json({ message: 'Error creating user', error: error.message });
+        }
+    }
+
+    static async verifyUser(req, res) {
+        try {
+            const { id } = req.params;
+            let isVerified = verifyToken(id)
+            if (isVerified?.status) {
+                return await UserModel.VerifyUser(isVerified?.payload?.email);
+            } else {
+                res.status(401).json({ message: 'Unauthorized', error: 'Unauthorized' });
+            }
+        } catch (error) {
+            res.status(500).json({ message: 'Error verifying user', error: error.message });
         }
     }
 

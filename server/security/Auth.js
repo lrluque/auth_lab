@@ -14,4 +14,4 @@ function getToken(user) {
     );
 }
 
-export default getToken
+export default getToken;

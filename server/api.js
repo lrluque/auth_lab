@@ -6,6 +6,7 @@ import {SECRET_JWT_KEY, APPLICATION_PORT} from "./config.js";
 import cookieParser from 'cookie-parser'
 import getToken from './security/Auth.js'
 import {Logger} from "./security/Logger.js";
+import {verifyToken} from "./security/Verification.js";
 
 const app = express();
 app.use(express.json());
@@ -29,21 +30,42 @@ app.get('/', (req, res) => {
     }
 });
 
+app.get('/verify/:id', async (req, res, next) => {
+    const { id } = req.params;
+    console.log(id)
+    const isVerified = verifyToken(id);
+    if (isVerified?.status) {
+        try {
+            const user = await UserController.verifyUser(req, res);
+            if (user) {
+                SetSessionUser(user, res);
+            } else {
+                return res.status(404).json({ message: 'User not found' });
+            }
+        } catch (err) {
+            return res.status(500).json({ message: 'Error verifying user', error: err.message });
+        }
+    } else {
+        return res.status(401).json({ message: 'Invalid or expired token' });
+    }
+});
 
+function SetSessionUser(user, res) {
+    const token = getToken(user);
+
+    res.cookie('access_token', token, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+    })
+        .status(201)
+        .json({status: 'success'});
+}
 
 app.post('/login', async (req, res) => {
     try {
         const user = await UserController.login(req);
-        const token = getToken(user);
-
-        res.cookie('access_token', token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'strict',
-        })
-            .status(201)
-            .json({ status: 'success' });
-
+        SetSessionUser(user, res)
         Logger.logSuccessfulLogin(user.id, req.ip.toString())
 
     } catch (error) {
@@ -54,7 +76,7 @@ app.post('/login', async (req, res) => {
                     id = user.id
                 }
                 Logger.logFailureLogin(id, req.ip.toString());
-                res.status(500).json({ message: 'Invalid email or password' });
+                res.status(500).json({ message: error.message });
             } catch (innerError) {
                 console.error('Error during login attempt:', innerError);
                 res.status(500).json({ message: 'Internal server error' });

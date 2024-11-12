@@ -26,23 +26,7 @@ const Signup = () => {
             const signupData = await signupResponse.json();
 
             if (signupResponse.ok) {
-                // Step 2: Attempt to log the user in after successful registration
-                const loginResponse = await fetch('http://localhost:5000/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({ email, password }),
-                });
-
-                const loginData = await loginResponse.json();
-
-                if (loginResponse.ok && loginData.status === 'success') {
-                    navigate('/protected');
-                } else {
-                    setErrorMessage(loginData.message || 'Email or password invalid.');
-                }
+                navigate('/');
             } else {
                 // Handle signup error
                 setErrorMessage(signupData.message || 'Signup failed. Please try again.');
