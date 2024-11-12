@@ -91,6 +91,12 @@ const Home = () => {
             >
                 Sign Up
             </button>
+            <button
+                className="button forgotButton"
+                onClick={() => navigate('/forgot-password')}
+            >
+                Forgot Password?
+            </button>
         </div>
     );
 };

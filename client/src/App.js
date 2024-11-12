@@ -5,6 +5,8 @@ import Protected from './views/protected.js';
 import Verify from './views/verify.js';
 import { useState } from 'react';
 import './App.css';
+import ForgotPassword from "./views/forgot-password";
+import ResetPassword from "./views/reset-password";
 
 function App() {
     const [loggedIn, setLoggedIn] = useState(false);
@@ -28,6 +30,14 @@ function App() {
                 <Route
                     path="/verify/:id"
                     element={<Verify />}
+                />
+                <Route
+                    path="/forgot-password"
+                    element={<ForgotPassword />}
+                />
+                <Route
+                    path="/reset-password/:id"
+                    element={<ResetPassword />}
                 />
             </Routes>
         </div>
