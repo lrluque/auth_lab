@@ -1,16 +1,9 @@
 import {UserModel} from "../models/UserModel.js";
-import {verifyToken} from "../security/Verification.js";
+import {verifyToken} from "../services/Verification.js";
+import {Auth} from "../services/Auth.js";
 
 
 export class UserController {
-    static async getUsers(req, res) {
-        try {
-            const users = await UserController.getUsers();
-            res.json(users);
-        } catch (error) {
-            res.status(500).json({ message: 'Error fetching users', error: error.message });
-        }
-    }
 
     static async getUser(req, res) {
         try {
@@ -56,12 +49,5 @@ export class UserController {
         }
     }
 
-    static async login(req) {
-        try {
-            const { email, password } = req.body;
-            return await UserModel.login(email, password);
-        } catch (error) {
-            throw new Error(error.message);
-        }
-    }
+
 }

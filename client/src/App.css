@@ -108,3 +108,19 @@ body, html {
         width: 90%;
     }
 }
+
+/* Efecto de "active" en los botones */
+.button:active {
+    transform: scale(0.98); /* Reduce un poco el tamaño para simular que el botón se presiona */
+    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra interior para dar efecto de profundidad */
+}
+
+/* Mantén los estilos específicos para cada botón */
+.inputButton:active {
+    background-color: #306fab; /* Color ligeramente más oscuro */
+}
+
+.returnButton:active {
+    background-color: #4e555b; /* Color ligeramente más oscuro */
+}
+

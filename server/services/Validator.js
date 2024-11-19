@@ -11,7 +11,7 @@ const validateUsername = (username) => {
     return typeof username === 'string' && username.length >= minLength && username.length <= maxLength;
 };
 
-// Password validation for security:
+// Password validation for services:
 // - Minimum 8 characters
 // - At least one uppercase letter
 // - At least one lowercase letter

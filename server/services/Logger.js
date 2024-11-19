@@ -23,38 +23,38 @@ const connection = await mysql.createConnection(config);
 export class Logger {
 
 
-    static async logSuccessfulLogin(userId, ip) {
+    static async logSuccessfulLogin(email, ip) {
         try {
             const status = events.success;
             const actionType = events.login;
             await connection.execute(
-                'INSERT INTO auditlogs (user_id, action_type, timestamp, status, ip_address) VALUES (?, ?, NOW(), ?, ?)',
-                [userId, actionType, status, ip]
+                'INSERT INTO auditlogs (email, action_type, timestamp, status, ip_address) VALUES (?, ?, NOW(), ?, ?)',
+                [email, actionType, status, ip]
             );
         } catch (error) {
             console.error('Logging failed for', error);
         }
     }
 
-    static async logFailureLogin(userId, ip) {
+    static async logFailureLogin(email, ip) {
         try {
             const status = events.failure;
             const actionType = events.login;
             await connection.execute(
-                'INSERT INTO auditlogs (user_id, action_type, timestamp, status, ip_address) VALUES (?, ?, NOW(), ?, ?)',
-                [userId, actionType, status, ip]
+                'INSERT INTO auditlogs (email, action_type, timestamp, status, ip_address) VALUES (?, ?, NOW(), ?, ?)',
+                [email, actionType, status, ip]
             );
         } catch (error) {
             console.error('Logging failed for', error);
         }
     }
 
-    static async logLogout(userId, ip) {
+    static async logLogout(email, ip) {
         const status = events.success;
         const actionType = events.logout;
         await connection.execute(
-            'INSERT INTO auditlogs (user_id, action_type, timestamp, status, ip_address) VALUES (?, ?, NOW(), ?, ?)',
-            [userId, actionType, status, ip]
+            'INSERT INTO auditlogs (email, action_type, timestamp, status, ip_address) VALUES (?, ?, NOW(), ?, ?)',
+            [email , actionType, status, ip]
         );
     } catch (error) {
         console.error('Logging failed for', error);

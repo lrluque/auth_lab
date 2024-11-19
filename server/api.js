@@ -4,9 +4,9 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import {SECRET_JWT_KEY, APPLICATION_PORT} from "./config.js";
 import cookieParser from 'cookie-parser'
-import getToken from './security/Auth.js'
-import {Logger} from "./security/Logger.js";
-import {verifyToken} from "./security/Verification.js";
+import {Logger} from "./services/Logger.js";
+import {verifyToken} from "./services/Verification.js";
+import {AuthController} from "./controllers/AuthController.js";
 
 const app = express();
 app.use(express.json());
@@ -19,6 +19,7 @@ app.use(cookieParser());
 
 app.get('/', (req, res) => {
     const token = req.cookies.access_token;
+    console.log(token)
     if (!token) {
         return res.json({status : 'not_logged'});
     }
@@ -50,37 +51,26 @@ app.get('/verify/:id', async (req, res, next) => {
     }
 });
 
-function SetSessionUser(user, res) {
-    const token = getToken(user);
 
-    res.cookie('access_token', token, {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'strict',
-    })
-        .status(201)
-        .json({status: 'success'});
-}
 
 app.post('/login', async (req, res) => {
     try {
-        const user = await UserController.login(req);
-        SetSessionUser(user, res)
-        Logger.logSuccessfulLogin(user.id, req.ip.toString())
-
+        const result = await AuthController.login(req);
+        if (result.status === 'Failure') {
+            await Logger.logFailureLogin(result.email, req.ip.toString());
+            res.status(400).json({ message: result.message });
+        } else {
+            await Logger.logSuccessfulLogin(result.email, req.ip.toString());
+            res.cookie('access_token', result.token, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'strict',
+            })
+                .status(201)
+                .json({status: 'success', data: result});
+        }
     } catch (error) {
-            try {
-                const user = await UserController.getUser(req, res);
-                let id = null;
-                if (user !== null) {
-                    id = user.id
-                }
-                Logger.logFailureLogin(id, req.ip.toString());
-                res.status(500).json({ message: error.message });
-            } catch (innerError) {
-                console.error('Error during login attempt:', innerError);
-                res.status(500).json({ message: 'Internal server error' });
-            }
+        throw new Error('Something went wrong. Please try again.');
     }
 });
 
@@ -97,7 +87,7 @@ app.post('/register', async (req, res) => {
 app.post('/logout', (req, res) => {
     const token = req.cookies.access_token;
     const decoded = jwt.verify(token, SECRET_JWT_KEY);
-    Logger.logLogout(decoded.id, req.ip)
+    Logger.logLogout(decoded.email, req.ip)
     res.clearCookie('access_token');
     res.json({ status: 'success', message: 'Logged out successfully' });
 });
@@ -115,23 +105,6 @@ app.get('/protected', (req, res) => {
         res.json({ status: 'success', message: 'Access granted', data });
     } catch (error) {
         res.status(401).json({ status: 'error', message: 'Unauthorized' });
-    }
-});
-
-
-app.get('/users', async (req, res) => {
-    const token = req.cookies.access_token;
-    if (!token) {
-        return res.status(403).json({ status: 'error', message: 'Access denied' });
-    }
-    try {
-        const data = jwt.verify(token, SECRET_JWT_KEY);
-        if (data.role !== 'admin') {
-            return res.status(403).json({ status: 'error', message: 'Access denied: Admins only' });
-        }
-        await UserController.getUsers(req, res);
-    } catch (error) {
-        res.status(401).json({ status: 'error', message: 'Internal error' });
     }
 });
 

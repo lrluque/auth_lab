@@ -14,13 +14,12 @@ const Home = () => {
                 });
 
                 const data = await response.json();
-
                 if (data.status === 'logged') {
                     navigate('/protected');
                 }
             } catch (error) {
                 console.error('Error checking login status:', error);
-                setErrorMessage('Please log in to continue.');
+                setErrorMessage(error.message);
             }
         };
 
@@ -49,11 +48,11 @@ const Home = () => {
             if (data.status === 'success') {
                 navigate('/protected');
             } else {
-                setErrorMessage(data.message || 'Email or password invalid.');
+                setErrorMessage(data.message);
             }
         } catch (error) {
             console.error('Login error:', error);
-            setErrorMessage('Network error. Please try again.');
+            setErrorMessage(error.message);
         }
     };
 
