@@ -28,24 +28,27 @@ export class UserController {
     static async createUser(req, res) {
         try {
             const { username, password, email } = req.body;
-            const user = await UserModel.createUser(username, email, password);
-            res.status(201).json({ message: 'UserModel created successfully' });
+            await UserModel.createUser(username, email, password);
+            res.status(201).json({ message: 'UserModel created successfully', email: email });
         } catch (error) {
+            console.error("Error creating user:", error);
             res.status(500).json({ message: 'Error creating user', error: error.message });
         }
     }
 
-    static async verifyUser(req, res) {
+    static async verifyUser(req) {
         try {
             const { id } = req.params;
             let isVerified = verifyToken(id)
             if (isVerified?.status) {
-                return await UserModel.VerifyUser(isVerified?.payload?.email);
+                const user = UserModel.VerifyUser(isVerified?.payload?.email);
+                const token = Auth.getToken(user.email, user.username, user.id, user.role)
+                return {status: 'Success', token: token}
             } else {
-                res.status(401).json({ message: 'Unauthorized', error: 'Unauthorized' });
+                return { status:  'Failure', message: 'Invalid verification token', error: 'Unauthorized' };
             }
         } catch (error) {
-            res.status(500).json({ message: 'Error verifying user', error: error.message });
+            return { status:  'Failure', message: 'Error verifying user', error: error.message };
         }
     }
 

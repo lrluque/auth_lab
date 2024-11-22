@@ -37,14 +37,21 @@ app.get('/verify/:id', async (req, res, next) => {
     const isVerified = verifyToken(id);
     if (isVerified?.status) {
         try {
-            const user = await UserController.verifyUser(req, res);
-            if (user) {
-                SetSessionUser(user, res);
+            const verify = await UserController.verifyUser(req);
+            if (verify.status === 'Success') {
+                res.cookie('access_token', verify.token, {
+                    httpOnly: true,
+                    secure: false,
+                    sameSite: 'strict',
+                })
+                    .status(201)
+                    .json({status: 'success'});
             } else {
-                return res.status(404).json({ message: 'User not found' });
+                res.status(404).json({ message: verify.message });
             }
         } catch (err) {
-            return res.status(500).json({ message: 'Error verifying user', error: err.message });
+            console.log(err)
+            res.status(500).json({ message: 'Error verifying user', error: err.message });
         }
     } else {
         return res.status(401).json({ message: 'Invalid or expired token' });

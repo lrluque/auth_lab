@@ -7,13 +7,13 @@ import {UserModel} from "../models/UserModel.js";
 export class Auth {
 
 
-    static async getToken(user) {
+    static async getToken(email, username, id, role) {
         return jwt.sign(
             {
-                email: user.email,
-                username: user.username,
-                id: user.id,
-                role: user.role
+                email,
+                username,
+                id,
+                role
             },
             SECRET_JWT_KEY,
             {expiresIn: "1h"}
@@ -32,7 +32,7 @@ export class Auth {
         if (!user.is_verified) {
             return {status: 'Failure', type: 'NOT_VERIFIED', message: 'User not verified', email : user.email};
         }
-        const token = await this.getToken(user);
+        const token = await this.getToken(user.email, user.username, user.id, user.role);
         return {status: 'Success', token, email: user.email, username: user.username, id: user.id, role: user.role};
     }
 
