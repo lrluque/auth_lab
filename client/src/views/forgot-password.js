@@ -1,10 +1,31 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/check-session', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                const data = await response.json();
+                if (data.status === 'logged') {
+                    navigate('/protected');
+                }
+            } catch (error) {
+                console.error('Error checking login status:', error);
+                setErrorMessage(error.message);
+            }
+        };
+
+        checkLoginStatus();
+    }, [navigate]);
 
     const handleForgotPassword = async (event) => {
         event.preventDefault();

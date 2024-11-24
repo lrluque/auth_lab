@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser'
 import {Logger} from "./services/Logger.js";
 import {verifyToken} from "./services/Verification.js";
 import {AuthController} from "./controllers/AuthController.js";
+import {Auth} from "./services/Auth.js";
 
 const app = express();
 app.use(express.json());
@@ -16,19 +17,15 @@ app.use(cors({
 }));
 app.use(cookieParser());
 
-
-app.get('/', (req, res) => {
-    const token = req.cookies.access_token;
-    console.log(token)
-    if (!token) {
-        return res.json({status : 'not_logged'});
-    }
-    try {
-        jwt.verify(token, SECRET_JWT_KEY);
-        return res.json({status: 'logged'});
-    } catch (error) {
-        return res.json({status: 'not_logged'});
-    }
+app.get('/check-session', (req, res) => {
+    Auth.verifyToken(req.cookies.access_token)
+        .then((token) => {
+            res.json(token);
+        })
+        .catch((error) => {
+            console.error('Error verifying token:', error);
+            res.status(401).json({ error: 'Invalid token' });
+        });
 });
 
 app.get('/verify/:id', async (req, res, next) => {

@@ -36,5 +36,17 @@ export class Auth {
         return {status: 'Success', token, email: user.email, username: user.username, id: user.id, role: user.role};
     }
 
+    static async verifyToken (token) {
+        if (!token) {
+            return {status : 'not_logged'};
+        }
+        try {
+            jwt.verify(token, SECRET_JWT_KEY);
+            return {status: 'logged'};
+        } catch (error) {
+            return {status: 'not_logged'};
+        }
+    }
+
 }
 

@@ -1,9 +1,31 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {json, useNavigate} from 'react-router-dom';
 
 const Signup = () => {
     const [errorMessage, setErrorMessage] = useState(''); // State for holding API error message
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/check-session', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                const data = await response.json();
+                if (data.status === 'logged') {
+                    console.log("logged")
+                    navigate('/protected');
+                }
+            } catch (error) {
+                console.error('Error checking login status:', error);
+                setErrorMessage(error.message);
+            }
+        };
+
+        checkLoginStatus();
+    }, [navigate]);
 
     const handleSignup = async (event) => {
         event.preventDefault();

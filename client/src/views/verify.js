@@ -2,9 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const Verify = () => {
+    const [errorMessage, setErrorMessage] = useState(''); // State for holding API error message
     const { id } = useParams(); // Extract `id` from the URL
     const navigate = useNavigate();
     const [message, setMessage] = useState('Verifying...');
+
+    useEffect(() => {
+        const checkLoginStatus = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/check-session', {
+                    method: 'GET',
+                    credentials: 'include',
+                });
+
+                const data = await response.json();
+                if (data.status === 'logged') {
+                    navigate('/protected');
+                }
+            } catch (error) {
+                console.error('Error checking login status:', error);
+                setErrorMessage(error.message);
+            }
+        };
+
+        checkLoginStatus();
+    }, [navigate]);
 
     useEffect(() => {
         const verifyUser = async () => {
