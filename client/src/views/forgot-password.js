@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ForgotPassword = () => {
+    const [errorMessage, setErrorMessage] = useState('');
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
@@ -29,7 +30,6 @@ const ForgotPassword = () => {
 
     const handleForgotPassword = async (event) => {
         event.preventDefault();
-
         try {
             const response = await fetch('http://localhost:5000/forgot-password', {
                 method: 'POST',
@@ -38,14 +38,10 @@ const ForgotPassword = () => {
                 },
                 body: JSON.stringify({ email }),
             });
-
             const data = await response.json();
-
-            if (response.ok) {
-                setMessage('A password reset link has been sent to your email.');
+            if (data.status === 'success' || data.status === 'failure') {
+                setMessage('If the email exists, a password reset link will be sent to your email.');
                 setTimeout(() => navigate('/'), 5000); // Redirect to home after 5 seconds
-            } else {
-                setMessage(data.message || 'An error occurred. Please try again.');
             }
         } catch (error) {
             console.error('Forgot password error:', error);

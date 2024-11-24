@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const ResetPassword = () => {
+    const [errorMessage, setErrorMessage] = useState('');
     const { id } = useParams(); // Extract `id` from the URL (token)
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [isTokenValid, setIsTokenValid] = useState(true);
+    const [email, setEmail] = useState(''); // New state to store email
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -29,25 +32,27 @@ const ResetPassword = () => {
         checkLoginStatus();
     }, [navigate]);
 
-    // Validate the token when the component mounts
+    // Validate the token and extract email when the component mounts
     useEffect(() => {
         const validateToken = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/verify-reset-token/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ token: id })
+                const response = await fetch(`http://localhost:5000/reset-password/${id}/`, {
+                    method: 'GET',
+                    credentials: 'include',
                 });
                 const data = await response.json();
 
-                if (!response.ok) {
-                    navigate('/forgot-password');
+                if (response.ok) {
+                    setEmail(data.email); // Extract email from response if valid
+                } else {
+                    setMessage(data.message || 'Invalid or expired token.');
+                    setIsTokenValid(false);
+                    setTimeout(() => navigate('/forgot-password'), 5000); // Redirect after 5 seconds
                 }
             } catch (error) {
-                console.error('Error validating token:', error);
-                navigate('/forgot-password');
+                setMessage('Error validating token');
+                setIsTokenValid(false);
+                setTimeout(() => navigate('/forgot-password'), 5000); // Redirect after 5 seconds
             }
         };
 
@@ -63,12 +68,12 @@ const ResetPassword = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/reset-password/${id}`, {
+            const response = await fetch(`http://localhost:5000/change-password/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ password }),
+                body: JSON.stringify({ email, password, id}), // Include email in the request body
             });
 
             const data = await response.json();
@@ -84,6 +89,14 @@ const ResetPassword = () => {
             setMessage('Network error. Please try again.');
         }
     };
+
+    if (!isTokenValid) {
+        return (
+            <div>
+                <p>{message}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="mainContainer">

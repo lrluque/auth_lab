@@ -93,4 +93,14 @@ export class UserModel {
         }
     }
 
+    static async updatePassword(email, password) {
+        try {
+            const password_hash = await Security.hash_password(password);
+            await connection.execute('UPDATE Users SET password_hash = ? WHERE email = ?', [password_hash, email]);
+            return {status: 'success'};
+        } catch (error) {
+            return {status: 'failure', type: 'ERROR', error};
+        }
+    }
+
 }

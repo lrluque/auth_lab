@@ -28,6 +28,41 @@ app.get('/check-session', (req, res) => {
         });
 });
 
+app.post('/forgot-password/', async (req, res) => {
+    try {
+        const result = await AuthController.forgotPassword(req)
+        res.status(200).json(result)
+    } catch (error) {
+        res.status(500).json({message: 'Error creating user', error: error.message});
+    }
+})
+
+app.post('/change-password', async (req, res) => {
+    try {
+        const result = await AuthController.changePassword(req)
+        if (result.status === "success") {
+            res.status(200).json(result)
+        } else {
+            console.log(result.error)
+            res.status(500).json({message: 'Error changing password', error: result.message});
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: 'Error changing password', error: error.message});
+    }
+})
+
+app.get('/reset-password/:id', async (req, res) => {
+    const { id } = req.params;
+    const isVerified = verifyToken(id);
+    console.log(isVerified)
+    if (isVerified?.status) {
+        res.status(201).json({status: 'success', message: 'Valid token', email: isVerified?.payload?.email});
+    } else {
+        return res.status(401).json({ status : 'failure', message: 'Invalid or expired token' });
+    }
+})
+
 app.get('/verify/:id', async (req, res, next) => {
     const { id } = req.params;
     console.log(id)

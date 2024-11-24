@@ -37,7 +37,7 @@ const generateAccessToken = (payload) => {
         throw new Error('Payload is required for generating access token');
     }
 
-    const token = jwt.sign(payload, secret, { algorithm: 'HS256', expiresIn: '10m' }); // Set to 10 minutes
+    const token = jwt.sign(payload, secret, { algorithm: 'HS256', expiresIn: '2m' }); // Set to 10 minutes
     const id = rmdStr(12);
     shortURL.set(id, token);
     return id;
