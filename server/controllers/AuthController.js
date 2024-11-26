@@ -2,6 +2,7 @@ import {Auth} from "../services/Auth.js";
 import {generateAccessToken, verifyToken} from "../services/Verification.js";
 import {Mail} from "../services/Mail.js";
 import {UserModel} from "../models/UserModel.js";
+import Validator from "../services/Validator.js";
 
 export class AuthController {
 
@@ -43,12 +44,17 @@ export class AuthController {
             const {email, password, token} = req.body;
             const tokenVerified = verifyToken(token)
             if (tokenVerified) {
-                return await UserModel.updatePassword(email, password);
+                if (Validator.validatePassword(password)) {
+                    return await UserModel.updatePassword(email, password);
+                } else {
+                    return {status: 'failure', message: 'Password must have at least 8 characters, at least one uppercase letter, at least one lowercase letter, at least one number and at least one special character.'}
+                }
             } else {
                 return {status: "failure", message: "Invalid token"}
             }
 
         } catch (error) {
+            console.log(error)
             throw new Error('Something went wrong. Please try again later');
         }
     }

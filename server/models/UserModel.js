@@ -45,7 +45,7 @@ export class UserModel {
             );
         } catch (error) {
             if (error.code === 'ER_DUP_ENTRY') {
-                throw new Error('Username or email already exists');
+                return {status: 'failure', message: 'Username or email already exists'}
             }
             throw error;
         }
